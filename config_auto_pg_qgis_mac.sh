@@ -1,16 +1,22 @@
 #!/bin/bash
 
-# Fichier source 
-SRC_FILE="/Users/hbngoukoulou/gobs/postgresql/pg_service.conf"
+# Declarer le Fichier source, changez le nom d'utisateur en remplaçant par le votre
+# Declare the source file, change the username to yours
+
+SRC_FILE="/Users/username/gobs/postgresql/pg_service.conf"
 
 
-# copie vers .pg_service.conf
-cp "$SRC_FILE" "/Users/hbngoukoulou/gobs/postgresql/.pg_service.conf"
-chmod 600 "/Users/hbngoukoulou/gobs/postgresql/.pg_service.conf"
-echo "✅ ~/.pg_service.conf créé."
+# Copie vers .pg_service.conf
+# Copy to .pg_service.conf
+
+cp "$SRC_FILE" "/Users/username/gobs/postgresql/.pg_service.conf"
+chmod 600 "/Users/username/gobs/postgresql/.pg_service.conf"
+echo "✅ ~/.pg_service.conf créé." #✅ ~/.pg_service.conf created
 
 
-# Extraction des parametres
+# Extraction des parametres de connexion
+# Extracting connection parameters
+
 SERVICE=$(grep -oP '^\[\K[^\]]+' "$SRC_FILE")
 HOST=$(grep '^host=' "$SRC_FILE" | cut -d= -f2)
 PORT=$(grep '^port=' "$SRC_FILE" | cut -d= -f2)
@@ -20,12 +26,16 @@ PASSWORD=$(grep '^password=' "$SRC_FILE" | cut -d= -f2)
 
 
 # Creation du fichier .pgpass
-echo "$HOST:$PORT:$DBNAME:$USER:$PASSWORD" > "/Users/hbngoukoulou/gobs/postgresql/pg_service.pgpass"
-chmod 600 "/Users/hbngoukoulou/gobs/postgresql/pg_service.pgpass"
+# Creating the .pgpass file
+
+echo "$HOST:$PORT:$DBNAME:$USER:$PASSWORD" > "/Users/username/gobs/postgresql/pg_service.pgpass"
+chmod 600 "/Users/username/gobs/postgresql/pg_service.pgpass"
 echo "✅ ~/.pgpass créé."
 
 
-# creation duu fichier .plist pour macOS
+# creation du fichier .plist pour macOS
+# creating the .plist file for macOS
+
 PLIST="./Library/LaunchAgents/environment.pgservice.plist"
 mkdir -p "./Library/LaunchAgents"
 
@@ -42,7 +52,7 @@ cat > "$PLIST" <<EOF
     <string>launchctl</string>
     <string>setenv</string>
     <string>PGSERVICEFILE</string>
-    <string>/Users/hbngoukoulou/gobs/postgresql/.pg_service.conf</string>
+    <string>/Users/user_name/gobs/postgresql/.pg_service.conf</string>
   </array>
   <key>RunAtLoad</key>
   <true/>
@@ -51,13 +61,15 @@ cat > "$PLIST" <<EOF
 EOF
 
 
-# charger la variable 
+# charger la variable
+# load variable
 launchctl unload "$PLIST" 2>/dev/null
 launchctl load "$PLIST"
 echo "✅ Variable d'environnement PGSERVICEFILE chargée."
 
 
-#verification 
+# verification
+
 echo "🔍 Vérification de la variable :"
 launchctl getenv PGSERVICEFILE
 
